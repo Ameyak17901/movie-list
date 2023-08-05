@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import StarRating from "./StartRating.js";
 import { useMovies } from "./useMovies.js";
 import { useLocalStorageState } from "./useLocalStorageState.js";
+import { useKey } from "./useKey.js";
 
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
@@ -33,18 +34,7 @@ export default function App() {
     setWatched((watched) => watched.filter((movie) => id !== movie.imdbId));
   }
 
-  useEffect(function () {
-    function callback(e) {
-      if (e.code === "Escape") {
-        handleCloseMovie();
-      }
-    }
-    document.addEventListener("keydown", callback);
-    return function () {
-      document.removeEventListener("keydown", callback);
-    };
-  }, []);
-
+  useKey("Escape", handleCloseMovie);
   return (
     <>
       <NavBar>
@@ -117,17 +107,10 @@ function Logo() {
 function Search({ query, setQuery }) {
   const inputEl = useRef(null);
 
-  useEffect(function () {
-    function callback(e) {
-      if (e.code === "Enter") {
-        inputEl.current.focus();
-        setQuery("");
-      }
-    }
-    document.addEventListener("keydown", callback);
-    return function () {
-      document.removeEventListener("keydown", callback);
-    };
+  useKey("Enter", function () {
+    if (document.activeElement === inputEl) return;
+    inputEl.current.focus();
+    setQuery("");
   });
 
   return (
